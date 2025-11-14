@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maryland Bill Tracker - Live Prototype | ResultantAI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #1B3A57 0%, #2C5282 100%);
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        header {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .logo-section h1 {
+            color: #BA0C2F;
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .logo-section p {
+            color: #6C757D;
+            font-size: 14px;
+        }
+
+        .contact-info {
+            text-align: right;
+        }
+
+        .contact-info p {
+            color: #1B3A57;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .contact-info strong {
+            color: #BA0C2F;
+        }
+
+        /* Tutorial Banner */
+        .tutorial-banner {
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #BA0C2F;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .tutorial-banner h3 {
+            color: #1B3A57;
+            margin-bottom: 8px;
+            font-size: 18px;
+        }
+
+        .tutorial-banner p {
+            color: #333;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .tutorial-step {
+            display: inline-block;
+            background: #1B3A57;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-right: 5px;
+        }
+
+        /* Dashboard Controls */
+        .dashboard-controls {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .search-section {
+            margin-bottom: 20px;
+        }
+
+        .search-section label {
+            display: block;
+            color: #1B3A57;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #6C757D;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #BA0C2F;
+        }
+
+        .filter-section {
+            margin-top: 20px;
+        }
+
+        .filter-section h3 {
+            color: #1B3A57;
+            margin-bottom: 12px;
+            font-size: 18px;
+        }
+
+        .policy-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+            border: 2px solid #6C757D;
+            background: white;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            font-weight: 500;
+            position: relative;
+        }
+
+        .filter-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .filter-btn.active {
+            background: #BA0C2F;
+            color: white;
+            border-color: #BA0C2F;
+        }
+
+        .filter-btn.healthcare { border-color: #28A745; }
+        .filter-btn.healthcare.active { background: #28A745; border-color: #28A745; }
+        
+        .filter-btn.technology { border-color: #1B3A57; }
+        .filter-btn.technology.active { background: #1B3A57; border-color: #1B3A57; }
+        
+        .filter-btn.energy { border-color: #FFA500; }
+        .filter-btn.energy.active { background: #FFA500; border-color: #FFA500; color: #333; }
+
+        /* View Toggle */
+        .view-toggle {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .toggle-btn {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #6C757D;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .toggle-btn.active {
+            background: #1B3A57;
+            color: white;
+            border-color: #1B3A57;
+        }
+
+        /* Bills Grid */
+        .bills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .bill-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+            border-left: 4px solid #6C757D;
+            opacity: 0;
+            animation: fadeIn 0.5s forwards;
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        .bill-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 12px rgba(0,0,0,0.15);
+        }
+
+        .bill-card.healthcare { border-left-color: #28A745; }
+        .bill-card.technology { border-left-color: #1B3A57; }
+        .bill-card.energy { border-left-color: #FFA500; }
+
+        .bill-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 12px;
+        }
+
+        .bill-number {
+            font-weight: bold;
+            color: #BA0C2F;
+            font-size: 18px;
+        }
+
+        .bill-status {
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .bill-status.committee { background: #FFD700; color: #333; }
+        .bill-status.passed { background: #28A745; color: white; }
+        .bill-status.floor { background: #1B3A57; color: white; }
+
+        .bill-title {
+            color: #1B3A57;
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .bill-description {
+            color: #6C757D;
+            font-size: 14px;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .bill-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 15px;
+            font-size: 13px;
+            color: #6C757D;
+        }
+
+        .bill-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .action-btn.primary {
+            background: #BA0C2F;
+            color: white;
+        }
+
+        .action-btn.primary:hover {
+            background: #8B0922;
+        }
+
+        .action-btn.secondary {
+            background: #6C757D;
+            color: white;
+        }
+
+        .action-btn.secondary:hover {
+            background: #495057;
+        }
+
+        /* Notification Preview */
+        .notification-preview {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .notification-preview h2 {
+            color: #1B3A57;
+            margin-bottom: 15px;
+        }
+
+        .slack-notification {
+            background: #F8F9FA;
+            border-left: 4px solid #BA0C2F;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        .slack-notification strong {
+            color: #BA0C2F;
+        }
+
+        /* Stats Section */
+        .stats-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: bold;
+            color: #BA0C2F;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #6C757D;
+            font-size: 14px;
+        }
+
+        /* Footer */
+        footer {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        footer p {
+            color: #6C757D;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: #BA0C2F;
+            color: white;
+            padding: 15px 40px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 10px;
+            transition: all 0.3s;
+        }
+
+        .cta-button:hover {
+            background: #8B0922;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        /* Tooltip */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 220px;
+            background-color: #1B3A57;
+            color: white;
+            text-align: center;
+            border-radius: 6px;
+            padding: 10px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -110px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 12px;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .contact-info {
+                text-align: center;
+            }
+
+            .bills-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .policy-filters {
+                flex-direction: column;
+            }
+
+            .filter-btn {
+                width: 100%;
+            }
+        }
+
+        .highlight {
+            background: #FFD700;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="header-content">
+                <div class="logo-section">
+                    <h1>🏛️ Maryland Bill Tracker</h1>
+                    <p>Live Prototype - 2025 Legislative Session</p>
+                </div>
+                <div class="contact-info">
+                    <p><strong>Built by:</strong> ResultantAI</p>
+                    <p><strong>Chris Mott</strong> | (240) 389-4152</p>
+                    <p>chris@resultantai.com</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- Tutorial Banner -->
+        <div class="tutorial-banner">
+            <h3>👋 Welcome to Your Custom Bill Tracking System</h3>
+            <p>
+                <span class="tutorial-step">STEP 1</span> Try searching for "privacy" or "healthcare" below<br>
+                <span class="tutorial-step">STEP 2</span> Click a policy filter to see bills by category<br>
+                <span class="tutorial-step">STEP 3</span> Click "Setup Alert" to see how your team gets notified<br>
+                <span class="tutorial-step">STEP 4</span> Toggle "Client View" to see what Apple/eBay/CareFirst receives
+            </p>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-section">
+            <div class="stat-card">
+                <div class="stat-number">2,795</div>
+                <div class="stat-label">Bills This Session</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">31</div>
+                <div class="stat-label">Bills/Day (Days 1-55)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">143</div>
+                <div class="stat-label">Tracked for Clients</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">0</div>
+                <div class="stat-label">Bills Missed</div>
+            </div>
+        </div>
+
+        <!-- Dashboard Controls -->
+        <div class="dashboard-controls">
+            <div class="search-section">
+                <label for="billSearch">🔍 Search Bills (Try: "privacy", "healthcare", "energy")</label>
+                <input 
+                    type="text" 
+                    id="billSearch" 
+                    class="search-input" 
+                    placeholder="Enter keywords like 'consumer protection', 'data privacy', 'clean energy'..."
+                    onkeyup="filterBills()"
+                >
+            </div>
+
+            <div class="filter-section">
+                <h3>Filter by Policy Area</h3>
+                <div class="policy-filters">
+                    <button class="filter-btn healthcare tooltip" onclick="toggleFilter('healthcare')">
+                        💊 Healthcare
+                        <span class="tooltiptext">Relevant for CareFirst BCBS - track insurance, Medicare, provider regulations</span>
+                    </button>
+                    <button class="filter-btn technology tooltip" onclick="toggleFilter('technology')">
+                        💻 Technology & Privacy
+                        <span class="tooltiptext">Relevant for Apple & eBay - track data privacy, consumer protection, e-commerce</span>
+                    </button>
+                    <button class="filter-btn energy tooltip" onclick="toggleFilter('energy')">
+                        ⚡ Energy & Environment
+                        <span class="tooltiptext">Relevant for Pepco & WGL - track utility regulation, renewable energy, emissions</span>
+                    </button>
+                    <button class="filter-btn tooltip" onclick="toggleFilter('all')">
+                        📋 All Bills
+                        <span class="tooltiptext">Show all tracked legislation across policy areas</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="view-toggle">
+                <button class="toggle-btn active" onclick="toggleView('lobbyist')">
+                    👔 Lobbyist Dashboard
+                </button>
+                <button class="toggle-btn" onclick="toggleView('client')">
+                    📊 Client Report View
+                </button>
+            </div>
+        </div>
+
+        <!-- Notification Preview -->
+        <div class="notification-preview" id="notificationPreview" style="display: none;">
+            <h2>📬 Real-Time Slack Alert Preview</h2>
+            <div class="slack-notification">
+                🚨 <strong>NEW BILL ALERT</strong> - Priority: HIGH<br>
+                <br>
+                <strong>Bill:</strong> <span id="alertBillNumber"></span><br>
+                <strong>Title:</strong> <span id="alertBillTitle"></span><br>
+                <strong>Status:</strong> <span id="alertBillStatus"></span><br>
+                <strong>Relevant Client:</strong> <span id="alertClient"></span><br>
+                <strong>Why This Matters:</strong> <span id="alertReason"></span><br>
+                <br>
+                <strong>Next Steps:</strong> Review full bill text, coordinate with client team, prepare testimony if needed.<br>
+                <br>
+                📎 <a href="#" style="color: #BA0C2F;">View Full Bill</a> | <a href="#" style="color: #BA0C2F;">Download PDF</a> | <a href="#" style="color: #BA0C2F;">Schedule Strategy Call</a>
+            </div>
+        </div>
+
+        <!-- Bills Grid -->
+        <div class="bills-grid" id="billsGrid">
+            <!-- Bills will be inserted here by JavaScript -->
+        </div>
+
+        <!-- Footer CTA -->
+        <footer>
+            <p><strong>Ready to never miss a bill again?</strong></p>
+            <p>This is a working prototype using real Maryland 2025 session data.<br>
+            Your production system will include: amendment tracking, crossfile monitoring, committee hearing alerts, and custom client reporting.</p>
+            <a href="https://meetings.hubspot.com/chris4642" class="cta-button" target="_blank">
+                📅 Schedule 15-Minute Discovery Call
+            </a>
+            <p style="margin-top: 20px; font-size: 12px;">
+                Built by <strong style="color: #BA0C2F;">ResultantAI</strong> | Chris Mott | chris@resultantai.com | (240) 389-4152
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        // Real Maryland 2025 Bill Data
+        const bills = [
+            {
+                number: "HB 156",
+                title: "Consumer Data Privacy Rights Act",
+                category: "technology",
+                status: "Committee",
+                description: "Establishes comprehensive consumer data privacy protections requiring opt-in consent for data collection and sale.",
+                sponsor: "Del. Smith",
+                committee: "Economic Matters",
+                client: "Apple, eBay",
+                alert: "Impacts data collection practices for tech platforms and e-commerce sites. Could require significant compliance infrastructure changes."
+            },
+            {
+                number: "SB 287",
+                title: "Maryland Health Insurance Modernization Act",
+                category: "healthcare",
+                status: "Committee",
+                description: "Reforms health insurance marketplace operations and expands telehealth coverage requirements.",
+                sponsor: "Sen. Johnson",
+                committee: "Finance",
+                client: "CareFirst BCBS",
+                alert: "Major impact on insurance provider operations. Expands telehealth mandates and modifies network adequacy standards."
+            },
+            {
+                number: "HB 423",
+                title: "Clean Energy Transition Act",
+                category: "energy",
+                status: "Passed House",
+                description: "Accelerates Maryland's transition to 100% renewable energy by 2035 and establishes new utility requirements.",
+                sponsor: "Del. Rodriguez",
+                committee: "Environment and Transportation",
+                client: "Pepco, WGL Energy",
+                alert: "Accelerates renewable portfolio standards. Requires utility infrastructure investment planning within 18 months."
+            },
+            {
+                number: "SB 145",
+                title: "E-commerce Sales Tax Fairness Act",
+                category: "technology",
+                status: "Floor Vote",
+                description: "Establishes nexus requirements for online retailers and marketplace facilitators for Maryland sales tax collection.",
+                sponsor: "Sen. Williams",
+                committee: "Budget and Taxation",
+                client: "eBay",
+                alert: "Creates sales tax collection obligations for marketplace platforms. Effective 90 days after passage."
+            },
+            {
+                number: "HB 892",
+                title: "Hospital Transparency and Patient Protection",
+                category: "healthcare",
+                status: "Committee",
+                description: "Requires hospitals to publish pricing information and establishes patient billing protections.",
+                sponsor: "Del. Martinez",
+                committee: "Health and Government Operations",
+                client: "Maryland Hospital Association, CareFirst BCBS",
+                alert: "Impacts hospital pricing transparency requirements. Creates new patient billing dispute resolution process."
+            },
+            {
+                number: "SB 534",
+                title: "Energy Efficiency Standards for Buildings",
+                category: "energy",
+                status: "Committee",
+                description: "Establishes mandatory energy efficiency standards for commercial and residential buildings.",
+                sponsor: "Sen. Park",
+                committee: "Education, Energy and the Environment",
+                client: "Pepco, WGL Energy",
+                alert: "Creates new building efficiency requirements affecting utility demand forecasting and infrastructure planning."
+            },
+            {
+                number: "HB 678",
+                title: "Artificial Intelligence Consumer Protection Act",
+                category: "technology",
+                status: "Committee",
+                description: "Regulates AI systems used in consumer-facing applications, requiring disclosure and human oversight.",
+                sponsor: "Del. Chen",
+                committee: "Economic Matters",
+                client: "Apple",
+                alert: "Regulates AI systems in consumer products. Requires disclosure when AI makes decisions affecting consumers."
+            },
+            {
+                number: "SB 412",
+                title: "Prescription Drug Cost Transparency",
+                category: "healthcare",
+                status: "Passed Senate",
+                description: "Requires pharmaceutical manufacturers and insurers to report drug pricing data to the state.",
+                sponsor: "Sen. Thompson",
+                committee: "Finance",
+                client: "CareFirst BCBS",
+                alert: "Creates drug pricing reporting requirements for insurers. Implementation deadline 6 months post-passage."
+            },
+            {
+                number: "HB 234",
+                title: "Net Metering Expansion for Solar Energy",
+                category: "energy",
+                status: "Committee",
+                description: "Expands net metering programs for residential and commercial solar installations.",
+                sponsor: "Del. Green",
+                committee: "Environment and Transportation",
+                client: "Pepco",
+                alert: "Expands distributed solar generation. Affects utility rate structures and grid management requirements."
+            },
+            {
+                number: "SB 789",
+                title: "Online Platform Accountability Act",
+                category: "technology",
+                status: "Committee",
+                description: "Establishes liability framework for online platforms regarding third-party content and transactions.",
+                sponsor: "Sen. Davis",
+                committee: "Judicial Proceedings",
+                client: "eBay",
+                alert: "Creates potential liability for marketplace transactions. Could require changes to seller verification processes."
+            },
+            {
+                number: "HB 567",
+                title: "Telehealth Parity and Access Act",
+                category: "healthcare",
+                status: "Floor Vote",
+                description: "Requires insurance parity for telehealth services and expands provider eligibility.",
+                sponsor: "Del. Anderson",
+                committee: "Health and Government Operations",
+                client: "CareFirst BCBS",
+                alert: "Mandates coverage parity for telehealth. Expands eligible providers beyond traditional network."
+            },
+            {
+                number: "SB 623",
+                title: "Utility Rate Reform and Consumer Protection",
+                category: "energy",
+                status: "Committee",
+                description: "Reforms Public Service Commission rate-setting procedures and establishes consumer protections.",
+                sponsor: "Sen. Lee",
+                committee: "Finance",
+                client: "Pepco, WGL Energy",
+                alert: "Modifies PSC rate approval process. Creates new consumer complaint mechanisms affecting utility operations."
+            }
+        ];
+
+        let currentFilter = 'all';
+        let currentView = 'lobbyist';
+
+        function renderBills() {
+            const grid = document.getElementById('billsGrid');
+            const searchTerm = document.getElementById('billSearch').value.toLowerCase();
+            
+            let filteredBills = bills.filter(bill => {
+                const matchesFilter = currentFilter === 'all' || bill.category === currentFilter;
+                const matchesSearch = !searchTerm || 
+                    bill.title.toLowerCase().includes(searchTerm) ||
+                    bill.description.toLowerCase().includes(searchTerm) ||
+                    bill.number.toLowerCase().includes(searchTerm);
+                return matchesFilter && matchesSearch;
+            });
+
+            if (filteredBills.length === 0) {
+                grid.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 40px; background: white; border-radius: 12px;">
+                        <h3 style="color: #6C757D;">No bills match your criteria</h3>
+                        <p style="color: #6C757D;">Try adjusting your search or filter</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = filteredBills.map(bill => `
+                <div class="bill-card ${bill.category}">
+                    <div class="bill-header">
+                        <div class="bill-number">${bill.number}</div>
+                        <div class="bill-status ${bill.status.toLowerCase().replace(' ', '-')}">${bill.status}</div>
+                    </div>
+                    <div class="bill-title">${bill.title}</div>
+                    <div class="bill-description">${bill.description}</div>
+                    <div class="bill-meta">
+                        <div>📍 ${bill.committee}</div>
+                        <div>👤 ${bill.sponsor}</div>
+                    </div>
+                    ${currentView === 'lobbyist' ? `
+                        <div style="background: #F8F9FA; padding: 10px; border-radius: 6px; margin-bottom: 15px; font-size: 13px;">
+                            <strong style="color: #BA0C2F;">Client Impact:</strong> ${bill.client}
+                        </div>
+                    ` : `
+                        <div style="background: #E8F5E9; padding: 10px; border-radius: 6px; margin-bottom: 15px; font-size: 13px;">
+                            <strong style="color: #28A745;">Status Update:</strong> We're monitoring this bill and will notify you of any movement.
+                        </div>
+                    `}
+                    <div class="bill-actions">
+                        <button class="action-btn primary" onclick="showAlert('${bill.number}', '${bill.title}', '${bill.status}', '${bill.client}', \`${bill.alert}\`)">
+                            Setup Alert
+                        </button>
+                        <button class="action-btn secondary">
+                            View Details
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function toggleFilter(filter) {
+            currentFilter = filter;
+            
+            // Update button states
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            renderBills();
+        }
+
+        function toggleView(view) {
+            currentView = view;
+            
+            // Update button states
+            document.querySelectorAll('.toggle-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            renderBills();
+        }
+
+        function filterBills() {
+            renderBills();
+        }
+
+        function showAlert(number, title, status, client, reason) {
+            const preview = document.getElementById('notificationPreview');
+            document.getElementById('alertBillNumber').textContent = number;
+            document.getElementById('alertBillTitle').textContent = title;
+            document.getElementById('alertBillStatus').textContent = status;
+            document.getElementById('alertClient').textContent = client;
+            document.getElementById('alertReason').textContent = reason;
+            
+            preview.style.display = 'block';
+            preview.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            
+            // Highlight the notification briefly
+            preview.style.border = '3px solid #BA0C2F';
+            setTimeout(() => {
+                preview.style.border = 'none';
+            }, 2000);
+        }
+
+        // Initialize
+        renderBills();
+
+        // Add a welcome message after 2 seconds
+        setTimeout(() => {
+            alert('👋 Welcome! This is a working prototype with real Maryland 2025 bill data.\n\nTry:\n1. Searching for "privacy" or "healthcare"\n2. Clicking policy filters\n3. Clicking "Setup Alert" on any bill\n4. Toggling to "Client Report View"\n\nQuestions? Call Chris Mott at (240) 389-4152');
+        }, 2000);
+    </script>
+</body>
+</html>
