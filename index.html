@@ -724,7 +724,7 @@
                 <br>
                 <strong>Next Steps:</strong> Review full bill text, coordinate with client team, prepare testimony if needed.<br>
                 <br>
-                📎 <a href="#" onclick="viewFullBill(document.getElementById('alertBillNumber').textContent); return false;" style="color: #BA0C2F;">View Full Bill</a> | <a href="#" onclick="downloadPDF(document.getElementById('alertBillNumber').textContent); return false;" style="color: #BA0C2F;">Download PDF</a> | <a href="https://meetings.hubspot.com/chris4642" target="_blank" style="color: #BA0C2F;">Schedule Strategy Call</a>
+                📎 <a href="#" onclick="viewFullBill(currentAlertBillNumber); return false;" style="color: #BA0C2F;">View Full Bill</a> | <a href="#" onclick="downloadPDF(currentAlertBillNumber); return false;" style="color: #BA0C2F;">Download PDF</a> | <a href="https://meetings.hubspot.com/chris4642" target="_blank" style="color: #BA0C2F;">Schedule Strategy Call</a>
             </div>
         </div>
 
@@ -896,6 +896,7 @@
 
         let currentFilter = 'all';
         let currentView = 'lobbyist';
+        let currentAlertBillNumber = null;
 
         function renderBills() {
             const grid = document.getElementById('billsGrid');
@@ -983,15 +984,16 @@
 
         function showAlert(number, title, status, client, reason) {
             const preview = document.getElementById('notificationPreview');
+            currentAlertBillNumber = number;
             document.getElementById('alertBillNumber').textContent = number;
             document.getElementById('alertBillTitle').textContent = title;
             document.getElementById('alertBillStatus').textContent = status;
             document.getElementById('alertClient').textContent = client;
             document.getElementById('alertReason').textContent = reason;
-            
+
             preview.style.display = 'block';
             preview.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            
+
             // Highlight the notification briefly
             preview.style.border = '3px solid #BA0C2F';
             setTimeout(() => {
